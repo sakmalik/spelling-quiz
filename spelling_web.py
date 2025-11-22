@@ -47,6 +47,7 @@ TEMPLATE = """
     <button name="action" value="submit">Submit Spelling</button>
     <button type="button" onclick="speakText('{{ word }}')">Repeat Word</button>
     <button name="action" value="ans">Answer (Spell)</button>
+    <button type="button" onclick="spellWord('{{ word }}')">Speak Answer</button>
     <button name="action" value="mean">Meaning</button>
     {% if show_next %}
     <button name="action" value="next">Next Word</button>
@@ -120,21 +121,10 @@ def quiz():
             spelling_str = spell_word(word)
             message = f"The correct spelling is: <b>{spelling_str}</b><br>(Word: {word})"
             show_next = True
-            # also trigger speech in browser
-            message += f"""
-            <script>
-                spellWord("{word}");
-            </script>
-            """
 
         elif action == "mean":
             meaning = get_meaning(word)
-            message = f"Meaning: {meaning}"
-            message += f"""
-            <script>
-                speakMeaning("{meaning}");
-            </script>
-            """
+            message = f"Meaning: {meaning} <br><button type='button' onclick='speakMeaning(\"{meaning}\")'>Speak Meaning</button>"
 
         elif action == "next":
             index += 1
