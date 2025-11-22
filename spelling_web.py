@@ -33,7 +33,7 @@ score = 0
 index = 0
 show_next = False   # flag to control Next button
 
-# --- HTML template with browser speech synthesis ---
+# --- HTML template ---
 TEMPLATE = """
 <!doctype html>
 <title>Spelling Quiz</title>
@@ -46,7 +46,7 @@ TEMPLATE = """
     <input type="text" name="spelling" placeholder="Type the spelling here">
     <button name="action" value="submit">Submit Spelling</button>
     <button type="button" onclick="speakText('{{ word }}')">Repeat Word</button>
-    <button type="button" onclick="spellWord('{{ word }}')">Answer (Spell)</button>
+    <button name="action" value="ans">Answer (Spell)</button>
     <button name="action" value="mean">Meaning</button>
     {% if show_next %}
     <button name="action" value="next">Next Word</button>
@@ -72,7 +72,6 @@ function spellWord(word) {
         setTimeout(() => speechSynthesis.speak(utterance), delay);
         delay += 600;
     }
-    // After spelling letters, speak the full word
     setTimeout(() => {
         const utterance = new SpeechSynthesisUtterance(word);
         utterance.rate = 0.9;
@@ -121,10 +120,21 @@ def quiz():
             spelling_str = spell_word(word)
             message = f"The correct spelling is: <b>{spelling_str}</b><br>(Word: {word})"
             show_next = True
+            # also trigger speech in browser
+            message += f"""
+            <script>
+                spellWord("{word}");
+            </script>
+            """
 
         elif action == "mean":
             meaning = get_meaning(word)
             message = f"Meaning: {meaning}"
+            message += f"""
+            <script>
+                speakMeaning("{meaning}");
+            </script>
+            """
 
         elif action == "next":
             index += 1
