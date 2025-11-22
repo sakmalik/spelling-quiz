@@ -130,3 +130,23 @@ def quiz():
             index += 1
             show_next = False
             if index < len(words):
+                word = words[index]
+                message = "Next word!"
+            else:
+                return f"<h1>Quiz complete!</h1><p>Final Score: {score} / {len(words)}</p>"
+
+        elif action == "quit":
+            return f"<h1>Quiz stopped!</h1><p>Final Score: {score} / {len(words)}</p><p>Goodbye!</p>"
+
+    return render_template_string(
+        TEMPLATE,
+        word=word,
+        score=score,
+        total=len(words),
+        message=message,
+        show_next=show_next,
+        meaning=meaning
+    )
+
+if __name__ == "__main__":
+    app.run(debug=True)
