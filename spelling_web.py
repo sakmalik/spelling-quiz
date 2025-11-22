@@ -57,19 +57,34 @@ TEMPLATE = """
 
 <script>
 function speakText(text) {
+    if (!text) return;
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
     speechSynthesis.speak(utterance);
 }
 
 function spellWord(word) {
+    if (!word) return;
     let delay = 0;
     for (let letter of word) {
         const utterance = new SpeechSynthesisUtterance(letter);
         utterance.rate = 0.9;
         setTimeout(() => speechSynthesis.speak(utterance), delay);
-        delay += 600; // 0.6s between letters
+        delay += 600;
     }
+    // After spelling letters, speak the full word
+    setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+    }, delay + 500);
+}
+
+function speakMeaning(text) {
+    if (!text) return;
+    const utterance = new SpeechSynthesisUtterance("The meaning is: " + text);
+    utterance.rate = 0.9;
+    speechSynthesis.speak(utterance);
 }
 </script>
 """
@@ -78,6 +93,7 @@ function spellWord(word) {
 def quiz():
     global index, score, show_next
     message = ""
+    meaning = ""
 
     if index >= len(words):
         return f"<h1>Quiz complete!</h1><p>Final Score: {score} / {len(words)}</p>"
@@ -114,15 +130,3 @@ def quiz():
             index += 1
             show_next = False
             if index < len(words):
-                word = words[index]
-                message = "Next word!"
-            else:
-                return f"<h1>Quiz complete!</h1><p>Final Score: {score} / {len(words)}</p>"
-
-        elif action == "quit":
-            return f"<h1>Quiz stopped!</h1><p>Final Score: {score} / {len(words)}</p><p>Goodbye!</p>"
-
-    return render_template_string(TEMPLATE, word=word, score=score, total=len(words), message=message, show_next=show_next)
-
-if __name__ == "__main__":
-    app.run(debug=True)
